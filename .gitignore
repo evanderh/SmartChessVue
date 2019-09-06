@@ -1,0 +1,13 @@
+# Bytecode
+__pycache__/
+*.pyc
+
+# Instance
+instance/
+
+# Logs
+*.log
+
+# Environments
+.env
+venv/
