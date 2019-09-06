@@ -1,0 +1,17 @@
+<html>
+    <head>
+
+      {% if title %}
+      <title>Bender Chess - {{ title }}</title>
+      {% else %}
+      <title>Bender Chess</title>
+      {% endif %}
+
+    </head>
+
+    <body>
+
+        {% block body %}{% endblock %}
+
+    </body>
+</html>

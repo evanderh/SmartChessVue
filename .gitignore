@@ -11,3 +11,6 @@ instance/
 # Environments
 .env
 venv/
+
+# Dev
+.vscode
