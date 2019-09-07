@@ -1,3 +1,5 @@
+import os
+import logging.config
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -29,6 +31,10 @@ def create_app(config_obj=config.Config):
     app.register_blueprint(errorsbp)
     from BenderChess.main import bp as mainbp
     app.register_blueprint(mainbp)
+
+    if not os.path.exists('logs'):
+        os.mkdir('logs')
+    logging.config.dictConfig(app.config['LOGCONFIG'])
 
     return app
 

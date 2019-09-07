@@ -1,4 +1,5 @@
 import os
+from BenderChess.logs import RequestFilter
 
 
 class Config():
@@ -11,6 +12,42 @@ class Config():
     # Database
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # Logging
+    LOGCONFIG = {
+        'version': 1,
+        'formatters': {
+            'default': {
+                'format': ('[%(ip)s] [%(method)s %(path)s] [%(asctime)s] '
+                           '[%(name)s %(levelname)s] %(message)s'),
+                'datefmt': '%Y-%m-%d %H:%M:%S %Z%z'
+            }
+        },
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+                'formatter': 'default',
+                'filters': ['RequestFilter']
+            },
+            'rotfile': {
+                'class': 'logging.handlers.RotatingFileHandler',
+                'filename': 'logs/main.log',
+                'maxBytes': 10485760,  # 10 Mb
+                'backupCount': 10,
+                'formatter': 'default',
+                'filters': ['RequestFilter'],
+            }
+        },
+        'filters': {
+            'RequestFilter': {
+                '()': RequestFilter
+            }
+        },
+        'root': {
+            'level': 'DEBUG',
+            'handlers': ['console', 'rotfile']
+        }
+    }
 
 
 class TestConfig(Config):

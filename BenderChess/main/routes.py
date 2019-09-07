@@ -1,5 +1,7 @@
 from datetime import datetime
-from flask import render_template, url_for, redirect, flash, request
+from flask import (
+    render_template, url_for, redirect, flash, request, current_app
+)
 from flask_login import current_user, login_user, logout_user
 from werkzeug.urls import url_parse
 from BenderChess import db
@@ -10,6 +12,7 @@ from BenderChess.main.forms import LoginForm, RegistrationForm
 
 @bp.before_app_request
 def before_request():
+    current_app.logger.info('Incoming request')
     if current_user.is_authenticated:
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
