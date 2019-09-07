@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block body %}
+    <h1>User: {{ user.username }}</h1>
+    <hr>
+    {% for game in games %}
+    <p>{{ game }}</p>
+    {% endfor %}
+{% endblock %}

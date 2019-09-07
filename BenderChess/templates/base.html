@@ -11,16 +11,15 @@
 
   <body>
     <header>
-      Bender Chess:
-      <a href="{{ url_for('main.home') }}">Home</a>
+      <a href="{{ url_for('main.home') }}">Bender Chess</a>:
 
       {% if current_user.is_authenticated %}
+      <a href="{{ url_for('main.profile', username=current_user.username) }}">Profile</a>
       <a href="{{ url_for('main.logout') }}">Logout</a>
       {% else %}
       <a href="{{ url_for('main.login') }}">Login</a>
       {% endif %}
 
-      <a href="{{ url_for('main.register') }}">Register</a>
     </header>
     <hr>
 

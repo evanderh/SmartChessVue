@@ -24,11 +24,13 @@ def create_app(config_obj=config.Config):
     login.init_app(app)
     login.login_view = 'main.login'
 
-    # Add blueprint
+    # Add blueprints
+    from BenderChess.errors import bp as errorsbp
+    app.register_blueprint(errorsbp)
     from BenderChess.main import bp as mainbp
     app.register_blueprint(mainbp)
 
     return app
 
 
-from BenderChess import models  # noqa: E402, F401
+from BenderChess import models  # noqa: E403, F401

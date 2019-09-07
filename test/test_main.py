@@ -25,13 +25,18 @@ def test_login(session, client):  # noqa: F811
     assert user in session
 
     rv = login_user(client)
-    assert b'Bender Chess - Home' in rv.data
+    assert b'Profile' in rv.data
 
     rv = logout_user(client)
-    assert b'Please log in to access this page' in rv.data
+    assert b'Login' in rv.data
 
     rv = login_user(client, username='badusername')
     assert b'Invalid username or password' in rv.data
 
     rv = login_user(client, password='badpassword')
     assert b'Invalid username or password' in rv.data
+
+
+def test_404(session, client):  # noqa: F811
+    rv = client.post('/badpath')
+    assert b'File Not Found' in rv.data

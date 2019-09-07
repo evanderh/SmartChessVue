@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask import render_template, url_for, redirect, flash, request
-from flask_login import current_user, login_user, logout_user, login_required
+from flask_login import current_user, login_user, logout_user
 from werkzeug.urls import url_parse
 from BenderChess import db
 from BenderChess.main import bp
@@ -16,10 +16,15 @@ def before_request():
 
 
 @bp.route('/')
-@bp.route('/index')
-@login_required
 def home():
-    return render_template('index.html', title='Home')
+    return render_template('home.html', title='Home')
+
+
+@bp.route('/@/<username>')
+def profile(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    games = ['Game 1', 'Game 2', 'Game 3']
+    return render_template('profile.html', user=user, games=games)
 
 
 @bp.route('/login', methods=['GET', 'POST'])
