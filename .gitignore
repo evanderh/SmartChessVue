@@ -9,8 +9,10 @@ instance/
 *.log
 
 # Environments
-.env
 venv/
+
+# Tests
+.pytest_cache
 
 # Dev
 .vscode

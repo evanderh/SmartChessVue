@@ -5,6 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 flake8 = "*"
+pytest = "*"
 
 [packages]
 flask = "*"
@@ -14,6 +15,8 @@ flask-login = "*"
 flask-sqlalchemy = "*"
 flask-migrate = "*"
 psycopg2 = "*"
+requests = "*"
+pytest-dotenv = "*"
 
 [requires]
 python_version = "3.7"

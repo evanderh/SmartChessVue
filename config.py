@@ -1,5 +1,6 @@
 import os
 
+
 class Config():
     """Default dev configuration"""
 
@@ -8,6 +9,13 @@ class Config():
     SERVER_NAME = "bender.localhost:5000"
 
     # Database
-    SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+
+class TestConfig(Config):
+    TESTING = True
+    WTF_CSRF_ENABLED = False
+    SQLALCHEMY_DATABASE_URI = os.environ.get('TESTING_DATABASE_URL')
+    TEST_USER = 'testuser'
+    TEST_PASS = 'testpass'
