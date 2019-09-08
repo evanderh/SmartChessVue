@@ -17,6 +17,7 @@ flask-migrate = "*"
 psycopg2 = "*"
 requests = "*"
 pytest-dotenv = "*"
+flask-cors = "*"
 
 [requires]
 python_version = "3.7"

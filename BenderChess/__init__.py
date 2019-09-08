@@ -4,6 +4,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
+from flask_cors import CORS
 
 import config
 
@@ -25,6 +26,9 @@ def create_app(config_obj=config.Config):
     migrate.init_app(app, db)
     login.init_app(app)
     login.login_view = 'main.login'
+
+    # TODO: Enable CORS only on domain of front end app
+    CORS(app, resources={r'/api/*': {'origins': '*'}})
 
     # Add blueprints
     from BenderChess.errors import bp as errorsbp
