@@ -18,7 +18,7 @@ def create_app(config_obj=config.Config):
     """App factory for Bender Chess"""
 
     # Create + configure app
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder='../dist/static')
     app.config.from_object(config_obj)
 
     # Init plugins
@@ -35,6 +35,8 @@ def create_app(config_obj=config.Config):
     app.register_blueprint(errorsbp)
     from BenderChess.main import bp as mainbp
     app.register_blueprint(mainbp)
+    from BenderChess.api import bp as apibp
+    app.register_blueprint(apibp, url_prefix='/api')
 
     if not os.path.exists('logs'):
         os.mkdir('logs')

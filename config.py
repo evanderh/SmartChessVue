@@ -13,6 +13,10 @@ class Config():
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    # Directories
+    APP_DIR = os.path.dirname(__file__)
+    DIST_DIR = os.path.join(APP_DIR, 'dist')
+
     # Logging
     LOGCONFIG = {
         'version': 1,

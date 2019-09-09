@@ -14,5 +14,8 @@ venv/
 # Tests
 .pytest_cache
 
+# Build
+dist/
+
 # Dev
 .vscode

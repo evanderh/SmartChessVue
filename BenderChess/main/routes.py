@@ -1,6 +1,7 @@
+import os
 from datetime import datetime
 from flask import (
-    render_template, url_for, redirect, flash, request, current_app
+    send_file, render_template, url_for, redirect, flash, request, current_app
 )
 from flask_login import current_user, login_user, logout_user
 from werkzeug.urls import url_parse
@@ -12,7 +13,7 @@ from BenderChess.main.forms import LoginForm, RegistrationForm
 
 @bp.before_app_request
 def before_request():
-    current_app.logger.info('Incoming request')
+    current_app.logger.debug('Incoming request')
     if current_user.is_authenticated:
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
@@ -20,10 +21,14 @@ def before_request():
 
 @bp.route('/')
 def home():
-    return render_template('home.html', title='Home')
+    dist_dir = current_app.config['DIST_DIR']
+    entry = os.path.join(dist_dir, 'index.html')
+    return send_file(entry)
+
+    # return render_template('home.html', title='Home')
 
 
-@bp.route('/@/<username>')
+@bp.route('/user/<username>')
 def profile(username):
     user = User.query.filter_by(username=username).first_or_404()
     games = ['Game 1', 'Game 2', 'Game 3']
