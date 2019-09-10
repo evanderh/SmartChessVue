@@ -3,6 +3,6 @@ from flask import jsonify
 from BenderChess.api import bp
 
 
-@bp.route('/hello')
-def api_hello():
-    return jsonify("let's play chess")
+@bp.route('/timeControls')
+def timeControls():
+    return jsonify(["1+0", "3+0", "5+0"])

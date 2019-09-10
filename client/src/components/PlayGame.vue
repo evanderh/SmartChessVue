@@ -1,6 +1,7 @@
 <template>
-  <div class="playgame">
-    <h1>{{ msg }}</h1>
+  <div class="card-content">
+    <p class="title"></p>
+    <router-link to="/game">{{ options.msg }}</router-link>
   </div>
 </template>
 
@@ -8,14 +9,14 @@
 export default {
   name: 'PlayGame',
   props: {
-    msg: String,
+    options: Object,
   },
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1 {
+.card-content {
   color: #42b983;
 }
 </style>
