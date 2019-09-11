@@ -1,7 +1,7 @@
 <template>
-  <div v-if="fen">
+  <div v-if="startFEN">
     <Board
-      :startfen="fen"
+      :startfen="startFEN"
     ></Board>
   </div>
   <div v-else>
@@ -21,21 +21,17 @@ export default {
   },
   data() {
     return {
-      id: null,
-      fen: null,
+      gameID: null,
+      startFEN: null,
     };
   },
-  methods: {
-    getGame() {
-      api.getGame(this.$route.params.id)
-        .then((response) => {
-          this.id = response.id;
-          this.fen = response.fen;
-        });
-    },
-  },
   created() {
-    this.getGame();
+    const gameID = this.$route.params.id;
+    api.fetchGame(gameID)
+      .then((response) => {
+        this.gameID = response.data.id;
+        this.startFEN = response.data.fen;
+      });
   },
 };
 </script>

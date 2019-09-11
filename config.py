@@ -7,7 +7,6 @@ class Config():
 
     # General
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'secret-dev-key'
-    SERVER_NAME = "bender.localhost:5000"
 
     # Database
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')

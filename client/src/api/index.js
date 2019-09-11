@@ -1,15 +1,16 @@
-const games = [
-  {
-    id: '1',
-    fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR  w KQkq - 0 1',
-  },
-  {
-    id: '2',
-    fen: 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1',
-  },
-];
+import axios from 'axios';
+
+const API_URL = 'http://localhost:5000/api';
 
 export default {
+  fetchUser() {
+    return axios.get(`${API_URL}/user/world`);
+  },
+
+  fetchGame(id) {
+    return axios.get(`${API_URL}/game/${id}`);
+  },
+
   getGameId() {
     return new Promise((resolve, reject) => {
       const gameId = '2';
