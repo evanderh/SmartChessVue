@@ -3,7 +3,6 @@
     <Board
       :fen="fen"
     ></Board>
-    <p>{{ fen }}</p>
   </div>
   <div v-else>
     <p>Loading...</p>

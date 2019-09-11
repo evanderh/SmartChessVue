@@ -17,15 +17,8 @@ export default {
       default: '',
     },
   },
-  // watch: {
-  //   fen:
-  // },
   computed: {
-    options() {
-      return {
-        fen: this.fen,
-      };
-    },
+
   },
   data() {
     return {
@@ -35,8 +28,50 @@ export default {
   },
   methods: {
     createBoard() {
-      console.log(this.options);
-      this.board = Chessground(this.$refs.board, this.options);
+      this.chess.load(this.fen);
+      this.drawBoard();
+    },
+    drawBoard() {
+      console.log(this.legalMoves());
+      this.board = Chessground(this.$refs.board, this.boardOpts());
+    },
+    makeMove(orig, dest, meta) {
+      // console.log(orig, dest, meta);
+      this.chess.move({ from: orig, to: dest });
+
+      this.board.set({
+        turnColor: this.stm(),
+        movable: this.movableOpts(),
+      });
+    },
+    boardOpts() {
+      return {
+        fen: this.fen,
+        turnColor: this.stm(),
+        movable: this.movableOpts(),
+      };
+    },
+    legalMoves() {
+      const dests = {};
+      this.chess.SQUARES.forEach(s => {
+        const ms = this.chess.moves({square: s, verbose: true});
+        if (ms.length)
+          dests[s] = ms.map(m => m.to);
+      });
+      return dests;
+    },
+    movableOpts() {
+      return {
+        free: false,
+        color: this.stm(),
+        dests: this.legalMoves(),
+        events: {
+          after: this.makeMove,
+        },
+      };
+    },
+    stm() {
+      return (this.chess.turn() === 'w') ? 'white' : 'black';
     },
   },
   mounted() {
