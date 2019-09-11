@@ -1,36 +1,42 @@
 <template>
-    <div class="blue merida">
-        <div class="cg-board-wrap" ref="board"></div>
-        <br>
-    </div>
+  <div v-if="fen">
+    <Board
+      :fen="fen"
+    ></Board>
+    <p>{{ fen }}</p>
+  </div>
+  <div v-else>
+    <p>Loading...</p>
+  </div>
 </template>
 
 <script>
-import Chess from 'chess.js';
-import { Chessground } from 'chessground';
+// @ is an alias to /src
+import Board from '@/components/Board.vue';
+import api from '@/api';
 
 export default {
   name: 'game',
-  methods: {
-    loadGame() {
-      this.board = Chessground(this.$refs.board, {
-        orientation: 'white',
-      });
-    },
-  },
-  mounted() {
-    this.loadGame();
+  components: {
+    Board,
   },
   data() {
     return {
-      board: null,
-      game: new Chess(),
+      id: null,
+      fen: null,
     };
+  },
+  methods: {
+    getGame() {
+      api.getGame(this.$route.params.id)
+        .then((response) => {
+          this.id = response.id;
+          this.fen = response.fen;
+        });
+    },
+  },
+  created() {
+    this.getGame();
   },
 };
 </script>
-
-<style>
-@import '../assets/css/chessground.css';
-@import '../assets/css/theme.css';
-</style>
