@@ -12,53 +12,60 @@ import { Chessground } from 'chessground';
 export default {
   name: 'board',
   props: {
-    fen: {
+    startfen: {
       type: String,
       default: '',
     },
   },
-  computed: {
-
-  },
   data() {
     return {
+      fen: this.startfen,
       board: null,
       chess: new Chess(),
     };
   },
   methods: {
     createBoard() {
+      // Load FEN string into game
       this.chess.load(this.fen);
-      this.drawBoard();
-    },
-    drawBoard() {
-      console.log(this.legalMoves());
-      this.board = Chessground(this.$refs.board, this.boardOpts());
-    },
-    makeMove(orig, dest, meta) {
-      // console.log(orig, dest, meta);
-      this.chess.move({ from: orig, to: dest });
 
+      // Create board display
+      this.board = Chessground(this.$refs.board, {
+        fen: this.fen,
+        turnColor: this.stm(),
+        movable: this.movableOpts(),
+      });
+    },
+    getMove(orig, dest) {
+      const moves = this.chess.moves({ verbose: true });
+      return moves.find(move => (move.from === orig) && (move.to === dest));
+    },
+    makeMove(orig, dest) {
+      // Get the move details
+      const move = this.getMove(orig, dest);
+
+      // Make the move in the game, update FEN
+      this.chess.move({ from: orig, to: dest, promotion: 'q' });
+      this.fen = this.chess.fen();
+
+      // Update board display
+      if ('promotion' in move) {
+        this.board.setPieces({
+          [move.to]: {
+            color: (move.color === 'w') ? 'white' : 'black',
+            role: 'queen',
+          },
+        });
+      }
       this.board.set({
         turnColor: this.stm(),
         movable: this.movableOpts(),
       });
+
+      console.log(this.chess.ascii());
     },
-    boardOpts() {
-      return {
-        fen: this.fen,
-        turnColor: this.stm(),
-        movable: this.movableOpts(),
-      };
-    },
-    legalMoves() {
-      const dests = {};
-      this.chess.SQUARES.forEach(s => {
-        const ms = this.chess.moves({square: s, verbose: true});
-        if (ms.length)
-          dests[s] = ms.map(m => m.to);
-      });
-      return dests;
+    stm() {
+      return (this.chess.turn() === 'w') ? 'white' : 'black';
     },
     movableOpts() {
       return {
@@ -70,8 +77,15 @@ export default {
         },
       };
     },
-    stm() {
-      return (this.chess.turn() === 'w') ? 'white' : 'black';
+    legalMoves() {
+      const dests = {};
+      this.chess.SQUARES.forEach((s) => {
+        const ms = this.chess.moves({ square: s, verbose: true });
+        if (ms.length) {
+          dests[s] = ms.map(m => m.to);
+        }
+      });
+      return dests;
     },
   },
   mounted() {

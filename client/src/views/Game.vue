@@ -1,7 +1,7 @@
 <template>
   <div v-if="fen">
     <Board
-      :fen="fen"
+      :startfen="fen"
     ></Board>
   </div>
   <div v-else>
