@@ -1,4 +1,4 @@
-from flask import jsonify
+from flask import jsonify, request
 # from BenderChess import db
 from BenderChess.api import bp
 
@@ -21,6 +21,18 @@ def getUser(username):
     })
 
 
+@bp.route('/game', methods=['GET', 'POST'])
+def game_api():
+    if request.method == "GET":
+        # Get all games
+        return jsonify(games)
+    else:
+        # Create a new game and return its' id
+        # For now always return an id of 2
+        # TODO: Create a new game
+        return jsonify(2)
+
+
 @bp.route('/game/<string:id>')
-def getGame(id):
+def getGameID(id):
     return jsonify(games[id])

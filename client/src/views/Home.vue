@@ -13,10 +13,9 @@ export default {
   methods: {
     // Play game button handler
     playGame() {
-      // Get a new game from the api
-      api.getGameId()
+      api.createGame()
         .then((response) => {
-          this.$router.push({ name: 'Game', params: { id: response } });
+          this.$router.push({ name: 'Game', params: { id: response.data } });
         });
     },
   },
