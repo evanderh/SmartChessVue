@@ -26,6 +26,10 @@ class User(UserMixin, db.Model):
     created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     last_seen = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
+    games = db.relationship("Game",
+                            primaryjoin="or_(User.id==Game.white_id, "
+                                        "User.id==Game.black_id)")
+
     def __init__(self, raw_password, **kwargs):
         super().__init__(**kwargs)
         self.set_password(raw_password)
@@ -38,6 +42,25 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return f"<User username={self.username}>"
+
+
+class Game(db.Model):
+    __tablename__ = "games"
+
+    # Identification
+    id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(UUID(as_uuid=True), unique=True, nullable=False,
+                     default=uuid.uuid4().hex)
+
+    # Game data
+    fen = db.Column(db.String(128), nullable=False)
+    white_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    black_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    white_player = db.relationship("User", foreign_keys=[white_id])
+    black_player = db.relationship("User", foreign_keys=[black_id])
+
+    def __repr__(self):
+        return f"<Game fen={self.fen}>"
 
 
 @login.user_loader
