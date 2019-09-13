@@ -11,10 +11,12 @@ from BenderChess.models import User
 
 @bp.before_app_request
 def before_request():
-    current_app.logger.debug('Incoming request')
-    # if current_user.is_authenticated:
-    #     current_user.last_seen = datetime.utcnow()
-    #     db.session.commit()
+    current_app.logger.debug('hello')
+
+
+@bp.after_app_request
+def after_request(request):
+    current_app.logger.debug('goodbye')
 
 
 @bp.route('/')
@@ -44,11 +46,6 @@ def login():
                        algorithm='HS256')
 
     return jsonify({'token': token.decode('UTF-8')})
-
-# @bp.route('/logout')
-# def logout():
-#     logout_user()
-#     return redirect(url_for('main.home'))
 
 
 @bp.route('/register', methods=['POST'])
