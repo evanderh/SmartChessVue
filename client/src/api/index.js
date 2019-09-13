@@ -1,4 +1,5 @@
 import axios from 'axios';
+import userService from './user.service';
 
 const API_URL = 'http://localhost:5000/api';
 
@@ -15,4 +16,5 @@ export default {
     return axios.post(`${API_URL}/game`);
   },
 
+  user: userService,
 };

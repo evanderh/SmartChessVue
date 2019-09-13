@@ -18,6 +18,7 @@ psycopg2 = "*"
 requests = "*"
 pytest-dotenv = "*"
 flask-cors = "*"
+pyjwt = "*"
 
 [requires]
 python_version = "3.7"

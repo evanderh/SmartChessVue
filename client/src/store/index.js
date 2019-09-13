@@ -1,11 +1,15 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import api from './api';
+import api from '../api';
+
+import account from './account.module';
+import alert from './alert.module';
+import users from './users.module';
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
+const game = {
   state: {
     userID: null,
     startFEN: '',
@@ -23,5 +27,14 @@ export default new Vuex.Store({
         state.startFEN = payload.fen;
       }
     },
+  },
+};
+
+export default new Vuex.Store({
+  modules: {
+    account,
+    alert,
+    users,
+    game,
   },
 });

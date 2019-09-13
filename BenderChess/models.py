@@ -30,15 +30,36 @@ class User(UserMixin, db.Model):
                             primaryjoin="or_(User.id==Game.white_id, "
                                         "User.id==Game.black_id)")
 
-    def __init__(self, raw_password, **kwargs):
+    def __init__(self, password, **kwargs):
         super().__init__(**kwargs)
-        self.set_password(raw_password)
+        self.set_password(password)
+
+    @classmethod
+    def authenticate(cls, **kwargs):
+        username = kwargs.get('username')
+        password = kwargs.get('password')
+
+        # Validate request
+        if not username or not password:
+            return None
+
+        # Check user + password
+        user = cls.query.filter_by(username=username).first()
+        if not user or not user.check_password(password):
+            return None
+
+        return user
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def to_dict(self):
+        return dict(id=self.id,
+                    uuid=self.uuid,
+                    username=self.username)
 
     def __repr__(self):
         return f"<User username={self.username}>"
@@ -58,6 +79,10 @@ class Game(db.Model):
     black_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     white_player = db.relationship("User", foreign_keys=[white_id])
     black_player = db.relationship("User", foreign_keys=[black_id])
+
+    def to_dict(self):
+        return dict(uuid=self.uuid,
+                    fen=self.fen)
 
     def __repr__(self):
         return f"<Game fen={self.fen}>"
