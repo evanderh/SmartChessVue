@@ -28,7 +28,7 @@ def create_app(config_obj=config.Config):
     login.login_view = 'main.login'
 
     # TODO: Enable CORS only on domain of front end app
-    CORS(app, resources={r'/api/*': {'origins': '*'}})
+    CORS(app)
 
     # Add blueprints
     from BenderChess.errors import bp as errorsbp

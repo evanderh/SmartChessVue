@@ -9,12 +9,12 @@ from BenderChess.main import bp
 from BenderChess.models import User
 
 
-# @bp.before_app_request
-# def before_request():
-#     current_app.logger.debug('Incoming request')
-#     if current_user.is_authenticated:
-#         current_user.last_seen = datetime.utcnow()
-#         db.session.commit()
+@bp.before_app_request
+def before_request():
+    current_app.logger.debug('Incoming request')
+    # if current_user.is_authenticated:
+    #     current_user.last_seen = datetime.utcnow()
+    #     db.session.commit()
 
 
 @bp.route('/')
