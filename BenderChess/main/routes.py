@@ -1,9 +1,9 @@
 import os
 import jwt
+import uuid
+import time
 from datetime import datetime, timedelta
-from flask import (
-    send_file, request, current_app, jsonify
-)
+from flask import send_file, request, current_app, jsonify, g
 from BenderChess import db
 from BenderChess.main import bp
 from BenderChess.models import User
@@ -11,12 +11,18 @@ from BenderChess.models import User
 
 @bp.before_app_request
 def before_request():
-    current_app.logger.debug('hello')
+    g.requestID = uuid.uuid4().hex
+    current_app.logger.debug('Recieved request')
+    g.start = time.time()
 
 
 @bp.after_app_request
-def after_request(request):
-    current_app.logger.debug('goodbye')
+def after_request(response):
+    g.status = response.status
+    g.status_code = response.status_code
+    elapsed = round(time.time() - g.get('start', time.time()), 4)
+    current_app.logger.debug(f'Response took {elapsed}s')
+    return response
 
 
 @bp.route('/')

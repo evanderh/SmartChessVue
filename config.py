@@ -21,8 +21,9 @@ class Config():
         'version': 1,
         'formatters': {
             'default': {
-                'format': ('[%(ip)s] [%(method)s %(path)s] [%(asctime)s] '
-                           '[%(name)s %(levelname)s] %(message)s'),
+                'format': ('[%(ip)s %(requestID)s] [%(method)s %(path)s] '
+                           '[%(asctime)s] [%(name)s %(levelname)s] '
+                           '[%(status)s] %(message)s'),
                 'datefmt': '%Y-%m-%d %H:%M:%S %Z%z'
             }
         },

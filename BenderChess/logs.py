@@ -11,9 +11,13 @@ class RequestFilter(Filter):
                                                   flask.request.remote_addr)
             record.method = flask.request.method
             record.path = flask.request.path
+            record.requestID = flask.g.get('requestID', '-')[:6]
+            record.status = flask.g.get('status', '-')
         else:
             record.ip = '-'
             record.method = '-'
             record.path = '-'
+            record.requestID = '-'
+            record.status = '-'
 
         return True
