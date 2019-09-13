@@ -5,7 +5,6 @@ import api from '../api';
 
 import account from './account.module';
 import alert from './alert.module';
-import users from './users.module';
 
 Vue.use(Vuex);
 
@@ -34,7 +33,6 @@ export default new Vuex.Store({
   modules: {
     account,
     alert,
-    users,
     game,
   },
 });
