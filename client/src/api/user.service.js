@@ -1,4 +1,3 @@
-// import config from 'config';
 import helpers from '../helpers';
 
 const { authHeader } = helpers;
@@ -87,7 +86,6 @@ function update(user) {
   return fetch(`${USER_API}/users/${user.id}`, requestOptions).then(handleResponse);
 }
 
-// prefixed function name with underscore because delete is a reserved word in javascript
 function mydelete(id) {
   const requestOptions = {
     method: 'DELETE',

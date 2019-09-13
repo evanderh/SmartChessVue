@@ -10,7 +10,6 @@
 </template>
 
 <script>
-// @ is an alias to /src
 import Board from '@/components/Board.vue';
 import api from '@/api';
 
@@ -27,10 +26,10 @@ export default {
   },
   created() {
     const gameID = this.$route.params.id;
-    api.fetchGame(gameID)
+    api.game.getGame(gameID)
       .then((response) => {
-        this.gameID = response.data.id;
-        this.startFEN = response.data.fen;
+        this.gameID = response.id;
+        this.startFEN = response.fen;
       });
   },
 };
