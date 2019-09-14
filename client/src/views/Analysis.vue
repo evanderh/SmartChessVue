@@ -1,8 +1,24 @@
 <template>
-  <div class="analysis">
-    <div class="blue merida">
-      <div class="cg-wrap" ref="board"></div>
+  <div class="row">
+
+    <div class="col">
+      <div id="board" class="blue merida">
+        <div class="cg-wrap" ref="board"></div>
+      </div>
     </div>
+
+    <div class="col">
+      <div id="history">
+        <ul>
+          <li
+            v-for="mv in history"
+            :key="`${mv.ply}${mv.color}`">
+            {{ mv.san }}
+          </li>
+        </ul>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -19,18 +35,12 @@ export default {
     };
   },
   computed: {
-    ...mapState('analysis', ['fen', 'game']),
+    ...mapState('analysis', ['fen', 'game', 'history']),
   },
   mounted() {
     this.boardOptions()
       .then((opts) => {
-        const options = {
-          ...opts,
-          movable: {
-            ...opts.movable,
-            events: { after: this.afterMove }
-          },
-        };
+        const options = this.addAfterMove(opts);
         this.board = Chessground(this.$refs.board, options);
       });
   },
@@ -45,6 +55,16 @@ export default {
         .then((opts) => {
           this.board.set(opts);
         });
+    },
+
+    addAfterMove(options) {
+      return {
+        ...options,
+        movable: {
+          ...options.movable,
+          events: { after: this.afterMove },
+        },
+      };
     },
 
     makePromotion(move) {
@@ -62,4 +82,13 @@ export default {
 <style>
 @import '../assets/css/chessground.css';
 @import '../assets/css/theme.css';
+
+#board {
+  padding: 64px;
+  border: 1px solid black;
+}
+
+#history {
+  margin-top: 20px;
+}
 </style>

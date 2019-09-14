@@ -25,15 +25,10 @@
         <div class="row">
           <div class="col-sm-6 offset-sm-3">
             <div v-if="alert.message" :class="`alert ${alert.type}`">{{alert.message}}</div>
-            <router-view/>
-          </div>
-
-          <div
-            v-if="account.status.loggedIn"
-            class="col-sm-6 offset-sm-3">
-            <p>{{ account.user.username }}</p>
           </div>
         </div>
+
+        <router-view/>
       </div>
     </div>
   </div>

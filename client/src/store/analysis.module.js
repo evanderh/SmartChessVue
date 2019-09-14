@@ -8,15 +8,23 @@ export default {
     game: new Chess(),
     fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
     stm: 'white',
+    moveClock: 1,
     history: [],
   },
 
   mutations: {
     move(state, move) {
+      // Make the move on the board
       state.game.move({ from: move.from, to: move.to, promotion: 'q' });
       state.fen = state.game.fen();
       state.stm = (state.game.turn() === 'w') ? 'white' : 'black';
-      state.history.push(move);
+      if (state.game.turn() === 'w') state.moveClock += 1;
+
+      // Add move to history
+      state.history.push({
+        ...move,
+        ply: state.moveClock,
+      });
     },
   },
 
