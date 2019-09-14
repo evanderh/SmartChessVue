@@ -1,31 +1,65 @@
 <template>
   <div class="analysis">
-    <Board />
+    <div class="blue merida">
+      <div class="cg-wrap" ref="board"></div>
+    </div>
   </div>
 </template>
 
 <script>
-import Board from '@/components/Board.vue';
-import api from '@/api';
+import { mapState, mapActions } from 'vuex';
+
+import { Chessground } from 'chessground';
 
 export default {
   name: 'Analysis',
-  components: {
-    Board,
-  },
   data() {
     return {
-      gameID: null,
-      startFEN: null,
+      board: null,
     };
   },
-  created() {
-    const gameID = 1;
-    api.game.getGame(gameID)
-      .then((response) => {
-        this.gameID = response.id;
-        this.startFEN = response.fen;
+  computed: {
+    ...mapState('analysis', ['fen', 'game']),
+  },
+  mounted() {
+    this.boardOptions()
+      .then((opts) => {
+        const options = {
+          ...opts,
+          movable: {
+            ...opts.movable,
+            events: { after: this.afterMove }
+          },
+        };
+        this.board = Chessground(this.$refs.board, options);
       });
+  },
+  methods: {
+    ...mapActions('analysis', ['makeMove', 'boardOptions']),
+
+    afterMove(from, to) {
+      const move = this.makeMove({ from, to });
+      if ('promotion' in move) this.makePromotion(move);
+      this.board.set(this.boardOptions());
+      this.boardOptions()
+        .then((opts) => {
+          this.board.set(opts);
+        });
+    },
+
+    makePromotion(move) {
+      this.board.setPieces({
+        [move.to]: {
+          color: (move.color === 'w') ? 'white' : 'black',
+          role: 'queen',
+        },
+      });
+    },
   },
 };
 </script>
+
+<style>
+@import '../assets/css/chessground.css';
+@import '../assets/css/theme.css';
+</style>
