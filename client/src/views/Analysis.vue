@@ -1,11 +1,6 @@
 <template>
-  <div v-if="startFEN">
-    <Board
-      :startfen="startFEN"
-    />
-  </div>
-  <div v-else>
-    <p>Loading...</p>
+  <div class="analysis">
+    <Board />
   </div>
 </template>
 
@@ -14,7 +9,7 @@ import Board from '@/components/Board.vue';
 import api from '@/api';
 
 export default {
-  name: 'game',
+  name: 'Analysis',
   components: {
     Board,
   },
@@ -25,7 +20,7 @@ export default {
     };
   },
   created() {
-    const gameID = this.$route.params.id;
+    const gameID = 1;
     api.game.getGame(gameID)
       .then((response) => {
         this.gameID = response.id;

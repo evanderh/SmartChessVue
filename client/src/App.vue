@@ -14,7 +14,9 @@
         v-else
         to="/login">
         Logout
-      </router-link>
+      </router-link> |
+
+      <button v-on:click="playGame">Play</button>
 
     </div>
 
@@ -39,6 +41,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
+import api from '@/api';
 
 export default {
   name: 'app',
@@ -53,6 +56,12 @@ export default {
       clearAlert: 'alert/clear',
       logout: 'account/logout',
     }),
+    playGame() {
+      api.game.createGame()
+        .then((gameID) => {
+          this.$router.push({ name: 'Game', params: { id: gameID } });
+        });
+    },
   },
   watch: {
     $route() {
