@@ -11,9 +11,9 @@
       <div id="history">
         <ul>
           <li
-            v-for="mv in history"
-            :key="`${mv.ply}${mv.color}`">
-            {{ mv.san }}
+            v-for="(mv, ix) in history"
+            :key="`${ix}${mv.color}`">
+            {{ mv }}
           </li>
         </ul>
       </div>
@@ -22,8 +22,22 @@
   </div>
 </template>
 
+<style>
+@import '../assets/css/chessground.css';
+@import '../assets/css/theme.css';
+
+#board {
+  width: 362px;
+  padding: 20px;
+  border: 1px solid black;
+  border-radius: 5px;
+  box-shadow: 0 5px 10px 2px rgba(0, 0, 0, 0.5);
+}
+</style>
+
+
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions, mapGetters } from 'vuex';
 
 import { Chessground } from 'chessground';
 
@@ -35,26 +49,20 @@ export default {
     };
   },
   computed: {
-    ...mapState('analysis', ['fen', 'game', 'history']),
+    ...mapState('analysis', ['game']),
+    ...mapGetters('analysis', ['boardOptions', 'history']),
   },
   mounted() {
-    this.boardOptions()
-      .then((opts) => {
-        const options = this.addAfterMove(opts);
-        this.board = Chessground(this.$refs.board, options);
-      });
+    const options = this.addAfterMove(this.boardOptions);
+    this.board = Chessground(this.$refs.board, options);
   },
   methods: {
-    ...mapActions('analysis', ['makeMove', 'boardOptions']),
+    ...mapActions('analysis', ['makeMove']),
 
     afterMove(from, to) {
       const move = this.makeMove({ from, to });
       if ('promotion' in move) this.makePromotion(move);
-      this.board.set(this.boardOptions());
-      this.boardOptions()
-        .then((opts) => {
-          this.board.set(opts);
-        });
+      this.board.set(this.boardOptions);
     },
 
     addAfterMove(options) {
@@ -78,17 +86,3 @@ export default {
   },
 };
 </script>
-
-<style>
-@import '../assets/css/chessground.css';
-@import '../assets/css/theme.css';
-
-#board {
-  padding: 64px;
-  border: 1px solid black;
-}
-
-#history {
-  margin-top: 20px;
-}
-</style>
