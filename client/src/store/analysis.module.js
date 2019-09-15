@@ -21,13 +21,28 @@ export default {
       state.currentGame.load_pgn(pgn);
     },
 
-    rewindToStart(state) {
+    gotoStart(state) {
       state.currentGame = new Chess();
     },
 
-    ffToCurrent(state) {
+    gotoCurrent(state) {
       state.currentGame = new Chess();
       state.currentGame.load_pgn(state.game.pgn());
+    },
+
+    gotoPrevious(state) {
+      const moves = state.currentGame.history();
+      moves.pop();
+      state.currentGame = new Chess();
+      moves.forEach(move => state.currentGame.move(move));
+    },
+
+    gotoNext(state) {
+      const pgn = state.currentGame.pgn();
+      const move = state.game.history()[state.currentGame.history().length];
+      state.currentGame = new Chess();
+      state.currentGame.load_pgn(pgn);
+      state.currentGame.move(move);
     },
   },
 
@@ -86,12 +101,20 @@ export default {
       return move;
     },
 
-    rewindToStart({ commit }) {
-      commit('rewindToStart');
+    gotoStart({ commit }) {
+      commit('gotoStart');
     },
 
-    ffToCurrent({ commit }) {
-      commit('ffToCurrent');
+    gotoCurrent({ commit }) {
+      commit('gotoCurrent');
+    },
+
+    gotoPrevious({ commit }) {
+      commit('gotoPrevious');
+    },
+
+    gotoNext({ commit }) {
+      commit('gotoNext');
     },
   },
 };

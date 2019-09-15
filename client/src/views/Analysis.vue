@@ -8,8 +8,8 @@
 
       <div id="buttons">
         <button @click="toStart">&lt;&lt;</button>
-        <!-- <button @click="previous">&lt;</button> -->
-        <!-- <button @click="next">&gt;</button> -->
+        <button @click="toPrevious">&lt;</button>
+        <button @click="toNext">&gt;</button>
         <button @click="toCurrent">&gt;&gt;</button>
       </div>
     </div>
@@ -90,15 +90,26 @@ export default {
     this.board = Chessground(this.$refs.board, options);
   },
   methods: {
-    ...mapActions('analysis', ['makeMove', 'rewindToStart', 'ffToCurrent']),
+    ...mapActions('analysis', ['makeMove', 'gotoStart', 'gotoCurrent',
+      'gotoPrevious', 'gotoNext']),
 
     toStart() {
-      this.rewindToStart();
+      this.gotoStart();
       this.board.set(this.boardOptions);
     },
 
     toCurrent() {
-      this.ffToCurrent();
+      this.gotoCurrent();
+      this.board.set(this.boardOptions);
+    },
+
+    toPrevious() {
+      this.gotoPrevious();
+      this.board.set(this.boardOptions);
+    },
+
+    toNext() {
+      this.gotoNext();
       this.board.set(this.boardOptions);
     },
 
