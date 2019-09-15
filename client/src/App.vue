@@ -16,7 +16,7 @@
         Logout
       </router-link> |
 
-      <button v-on:click="playGame">Play</button>
+      <button @click="playGame">Play</button>
 
     </div>
 
