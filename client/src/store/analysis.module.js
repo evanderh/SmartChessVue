@@ -101,20 +101,5 @@ export default {
       return move;
     },
 
-    gotoStart({ commit }) {
-      commit('gotoStart');
-    },
-
-    gotoCurrent({ commit }) {
-      commit('gotoCurrent');
-    },
-
-    gotoPrevious({ commit }) {
-      commit('gotoPrevious');
-    },
-
-    gotoNext({ commit }) {
-      commit('gotoNext');
-    },
   },
 };
