@@ -2,8 +2,8 @@
   <div class="row">
 
     <div class="col-md-6">
-      <div id="board" class="blue merida">
-        <div class="cg-wrap" ref="board"></div>
+      <div class="blue merida">
+        <div id="board" class="cg-wrap" ref="board"></div>
       </div>
 
       <div id="buttons">
@@ -26,15 +26,26 @@
     </div>
 
     <div class="col-md-6">
+      <b-tabs>
+        <b-tab title="Analysis" active>
+          <div id="engineOutput" class="engineTab">
+            <div class="blue merida">
+              <div id="engineBoard" class="cg-wrap" ref="engineBoard"></div>
+            </div>
+          </div>
+        </b-tab>
 
-      <div id="analysis">
-        <p class="uciLine"
-          v-for="(line, ix) in output"
-          :key="`${ix}-${line}`">
-          {{ line }}
-        </p>
-      </div>
+        <b-tab title="Raw">
+          <div id="uciOutput" class="engineTab" ref="uciOutputDiv">
+            <p
+              v-for="(line, ix) in output"
+              :key="`${ix}-${line}`">
+              {{ line }}
+            </p>
+          </div>
+        </b-tab>
 
+      </b-tabs>
     </div>
 
   </div>
@@ -56,34 +67,72 @@ export default {
     return {
       board: null,
       engine: null,
+      engineBoard: null,
+      bestMove: null,
       output: [],
+      depth: 10,
     };
   },
 
   created() {
+    this.engine = new Lozza();
     const vm = this;
-    vm.engine = new Lozza();
-    vm.engine.onmessage = e => vm.output.push(e.data);
-    vm.engine.postMessage('uci');
-    vm.engine.postMessage('ucinewgame');
-    vm.engine.postMessage('position startpos');
-    vm.engine.postMessage('go depth 10');
+    this.engine.onmessage = e => vm.output.push(e.data);
+
+    this.engine.postMessage('uci');
+    this.engine.postMessage('ucinewgame');
+    this.search(this.depth);
   },
 
   computed: {
-    ...mapState('analysis', ['engineLozza', 'engineOutput']),
-    ...mapGetters('analysis', ['boardOptions', 'history', 'pgn']),
+    ...mapState('analysis', ['currentGame']),
+    ...mapGetters('analysis', ['boardOptions', 'history', 'currentFEN']),
+  },
+
+  watch: {
+    currentGame() {
+      this.search(this.depth);
+    },
+
+    output(uciOutput) {
+      const line = uciOutput[uciOutput.length - 1];
+      const words = line.split(' ');
+      if (words[0] === 'bestmove') [, this.bestMove] = words;
+    },
+
+    bestMove(newBest) {
+      const orig = newBest.slice(0, 2);
+      const dest = newBest.slice(2);
+      this.engineBoard.move(orig, dest);
+    },
   },
 
   mounted() {
     const options = this.addAfterMove(this.boardOptions);
     this.board = Chessground(this.$refs.board, options);
+    this.engineBoard = Chessground(this.$refs.engineBoard, {
+      viewOnly: true,
+      fen: this.currentFEN,
+    });
+    window.addEventListener('resize', () => {
+      document.body.dispatchEvent(new Event('chessground.resize'));
+    });
+  },
+
+  updated() {
+    // Scroll to bottom of uci output
+    const output = this.$refs.uciOutputDiv;
+    output.scrollTop = output.scrollHeight;
   },
 
   methods: {
     ...mapActions('analysis', ['makeMove']),
     ...mapMutations('analysis', ['gotoStart', 'gotoCurrent', 'gotoPrevious', 'gotoNext']),
 
+    search(depth) {
+      this.engine.postMessage(`position fen ${this.currentFEN}`);
+      this.engine.postMessage(`go depth ${depth}`);
+    },
 
     toStart() {
       this.gotoStart();
@@ -109,6 +158,9 @@ export default {
       const move = this.makeMove({ from, to });
       if ('promotion' in move) this.makePromotion(move);
       this.board.set(this.boardOptions);
+      // Re-search
+      this.engine.postMessage(`position ${this.currentFEN}`);
+      this.engine.postMessage('go depth 11');
     },
 
     // Helper methods
@@ -134,22 +186,27 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 @import '../assets/css/chessground.css';
 @import '../assets/css/theme.css';
 
-.uciLine {
-  font-size: 8px;
-  margin: 0;
+#board {
+  background-size: cover;
+  margin: 20px auto;
+  display: inline-block;
+
+  height: 362px;
+  width: 362px;
+
+  border: 1px solid black;
+  border-radius: 3px;
+  box-shadow: 0 3px 5px 1px rgba(0, 0, 0, 0.5);
 }
 
-#board {
-  width: 362px;
-  padding: 20px;
-  margin: auto;
-  border: 1px solid black;
-  border-radius: 5px;
-  box-shadow: 0 5px 10px 2px rgba(0, 0, 0, 0.5);
+#engineBoard {
+  height: 200px;
+  width: 200px;
+  margin: 10px;
 }
 
 #buttons {
@@ -163,19 +220,27 @@ export default {
 }
 
 #movehistory {
-  padding: 20px;
+  padding: 5px;
   border: 1px solid black;
   border-radius: 5px;
   box-shadow: 0 5px 10px 2px rgba(0, 0, 0, 0.5);
-  margin-bottom: 20px;
+  font-size: 14px;
 }
 
-#analysis {
-  height: 500px;
-  overflow-y: scroll;
+.engineTab {
   padding: 5px;
-  border: 1px solid black;
-  border-radius: 2px;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+  border: 1px solid #dee2e6;
+  border-top: none;
+}
+
+#uciOutput {
+  height: 500px;
+  overflow: scroll;
+}
+
+#uciOutput p {
+  white-space: nowrap;
+  font-size: 8px;
+  margin: 0;
 }
 </style>
