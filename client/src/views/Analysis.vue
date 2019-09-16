@@ -14,7 +14,7 @@
       </div>
 
       <div id="movehistory">
-        <p>Move history</p>
+        <h6>Move history</h6>
         <p>
           <span
             v-for="(mv, ix) in history"
@@ -68,9 +68,13 @@ export default {
       board: null,
       engine: null,
       engineBoard: null,
-      bestMove: null,
+      engineDepth: 0,
+      engineTime: 0,
+      enginePV: [],
+      engineScore: '',
+      engineBestMove: null,
       output: [],
-      depth: 10,
+      depth: 13,
     };
   },
 
@@ -81,6 +85,7 @@ export default {
 
     this.engine.postMessage('uci');
     this.engine.postMessage('ucinewgame');
+    this.search(9);
     this.search(this.depth);
   },
 
@@ -94,15 +99,33 @@ export default {
       this.search(this.depth);
     },
 
-    output(uciOutput) {
-      const line = uciOutput[uciOutput.length - 1];
-      const words = line.split(' ');
-      if (words[0] === 'bestmove') [, this.bestMove] = words;
+    output(output) {
+      // Watch the engine output, UCI protocol
+      // http://wbec-ridderkerk.nl/html/UCIProtocol.html
+      if (output.length > 200) output.shift();
+
+      const newline = output[output.length - 1];
+      const words = newline.split(' ');
+
+      const UCIword = words.shift();
+      switch (UCIword) {
+        case 'bestmove':
+          [this.engineBestMove] = words;
+          break;
+
+        case 'info':
+          break;
+
+        default:
+          break;
+      }
     },
 
-    bestMove(newBest) {
-      const orig = newBest.slice(0, 2);
-      const dest = newBest.slice(2);
+    engineBestMove(best) {
+      console.log(best);
+      const orig = best.slice(0, 2);
+      const dest = best.slice(2);
+      this.mountEngineBoard();
       this.engineBoard.move(orig, dest);
     },
   },
@@ -110,13 +133,10 @@ export default {
   mounted() {
     const options = this.addAfterMove(this.boardOptions);
     this.board = Chessground(this.$refs.board, options);
-    this.engineBoard = Chessground(this.$refs.engineBoard, {
-      viewOnly: true,
-      fen: this.currentFEN,
-    });
     window.addEventListener('resize', () => {
       document.body.dispatchEvent(new Event('chessground.resize'));
     });
+    this.mountEngineBoard();
   },
 
   updated() {
@@ -128,6 +148,13 @@ export default {
   methods: {
     ...mapActions('analysis', ['makeMove']),
     ...mapMutations('analysis', ['gotoStart', 'gotoCurrent', 'gotoPrevious', 'gotoNext']),
+
+    mountEngineBoard() {
+      this.engineBoard = Chessground(this.$refs.engineBoard, {
+        viewOnly: true,
+        fen: this.currentFEN,
+      });
+    },
 
     search(depth) {
       this.engine.postMessage(`position fen ${this.currentFEN}`);
@@ -160,7 +187,7 @@ export default {
       this.board.set(this.boardOptions);
       // Re-search
       this.engine.postMessage(`position ${this.currentFEN}`);
-      this.engine.postMessage('go depth 11');
+      this.search(this.depth);
     },
 
     // Helper methods
@@ -193,20 +220,20 @@ export default {
 #board {
   background-size: cover;
   margin: 20px auto;
-  display: inline-block;
 
   height: 362px;
   width: 362px;
 
   border: 1px solid black;
   border-radius: 3px;
-  box-shadow: 0 3px 5px 1px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.5);
 }
 
 #engineBoard {
-  height: 200px;
-  width: 200px;
-  margin: 10px;
+  height: 202px;
+  width: 202px;
+  margin: 10px auto;
+  border: 1px solid #b1b4b6;
 }
 
 #buttons {
@@ -221,10 +248,11 @@ export default {
 
 #movehistory {
   padding: 5px;
-  border: 1px solid black;
-  border-radius: 5px;
-  box-shadow: 0 5px 10px 2px rgba(0, 0, 0, 0.5);
-  font-size: 14px;
+  border: 1px solid #dee2e6;
+  border-radius: 2px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+  font-size: 13px;
+  margin: 40px;
 }
 
 .engineTab {
