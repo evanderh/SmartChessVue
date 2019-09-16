@@ -20,16 +20,14 @@
 
     </div>
 
-    <div class="jumbotron">
-      <div class="container">
-        <div class="row">
-          <div class="col-sm-6 offset-sm-3">
-            <div v-if="alert.message" :class="`alert ${alert.type}`">{{alert.message}}</div>
-          </div>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-6 offset-sm-3">
+          <div v-if="alert.message" :class="`alert ${alert.type}`">{{alert.message}}</div>
         </div>
-
-        <router-view/>
       </div>
+
+      <router-view/>
     </div>
   </div>
 </template>

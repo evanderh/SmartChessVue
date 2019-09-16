@@ -15,13 +15,13 @@
 
       <div id="movehistory">
         <p>Move history</p>
-        <ul>
-          <li
+        <p>
+          <span
             v-for="(mv, ix) in history"
             :key="`${ix}${mv.color}`">
             {{ mv.san }}
-          </li>
-        </ul>
+          </span>
+        </p>
       </div>
     </div>
 
@@ -171,9 +171,11 @@ export default {
 }
 
 #analysis {
-  padding: 20px;
+  height: 500px;
+  overflow-y: scroll;
+  padding: 5px;
   border: 1px solid black;
-  border-radius: 5px;
-  box-shadow: 0 5px 10px 2px rgba(0, 0, 0, 0.5);
+  border-radius: 2px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
 }
 </style>
