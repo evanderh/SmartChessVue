@@ -29,9 +29,51 @@
       <b-tabs>
         <b-tab title="Analysis" active>
           <div id="engineOutput" class="engineTab">
+
+            <dl
+              v-if="engineName"
+              class="row">
+              <dt class="col-4">Engine: </dt>
+              <dd class="col-8">
+                {{ engineName }}
+              </dd>
+            </dl>
+            <p>
+              <span
+                v-if="engineName"
+                class="badge badge-pill badge-primary">
+              </span>
+            </p>
+
             <div class="blue merida">
               <div id="engineBoard" class="cg-wrap" ref="engineBoard"></div>
             </div>
+
+            <dl class="row">
+              <dt class="col-4">Best move: </dt>
+              <dd class="col-8">{{ engineBestMove }}</dd>
+            </dl>
+
+            <dl class="row">
+              <dt class="col-4">Search time: </dt>
+              <dd class="col-8">{{ engineTime }}ms</dd>
+            </dl>
+
+            <dl class="row">
+              <dt class="col-4">Search depth:</dt>
+              <dd class="col-8">{{ engineDepth }}</dd>
+            </dl>
+
+            <dl class="row">
+              <dt class="col-4">PV</dt>
+              <dd class="col-8">
+                <span
+                  v-for="(mv, ix) in enginePV"
+                  :key="`${mv}${ix}`">
+                  {{ mv }}
+                </span>
+              </dd>
+            </dl>
           </div>
         </b-tab>
 
@@ -67,26 +109,17 @@ export default {
     return {
       board: null,
       engine: null,
+      engineName: '',
       engineBoard: null,
       engineDepth: 0,
       engineTime: 0,
+      engineNodes: 0,
       enginePV: [],
       engineScore: '',
       engineBestMove: null,
       output: [],
       depth: 13,
     };
-  },
-
-  created() {
-    this.engine = new Lozza();
-    const vm = this;
-    this.engine.onmessage = e => vm.output.push(e.data);
-
-    this.engine.postMessage('uci');
-    this.engine.postMessage('ucinewgame');
-    this.search(9);
-    this.search(this.depth);
   },
 
   computed: {
@@ -105,15 +138,47 @@ export default {
       if (output.length > 200) output.shift();
 
       const newline = output[output.length - 1];
-      const words = newline.split(' ');
+      let words = newline.split(' ');
 
       const UCIword = words.shift();
+      let word = null;
       switch (UCIword) {
         case 'bestmove':
           [this.engineBestMove] = words;
           break;
 
+        case 'id':
+          if (words.shift() === 'name') this.engineName = words.shift();
+          break;
+
         case 'info':
+          // For each info value
+          word = words.shift();
+          while (word !== undefined) {
+            switch (word) {
+              case 'depth':
+                this.engineDepth = parseInt(words.shift(), 10);
+                break;
+
+              case 'time':
+                this.engineTime = parseInt(words.shift(), 10);
+                break;
+
+              case 'nodes':
+                this.engineNodes = parseInt(words.shift(), 10);
+                break;
+
+              case 'pv':
+                this.enginePV = words;
+                words = []; // empty words to exit outer loop
+                break;
+
+              default:
+                break;
+            }
+            word = words.shift();
+          }
+
           break;
 
         default:
@@ -122,12 +187,26 @@ export default {
     },
 
     engineBestMove(best) {
-      console.log(best);
       const orig = best.slice(0, 2);
       const dest = best.slice(2);
-      this.mountEngineBoard();
+      this.drawEngineBoard();
       this.engineBoard.move(orig, dest);
     },
+
+    enginePV(newPV) {
+      console.log('pv', newPV[0]);
+    },
+  },
+
+  created() {
+    this.engine = new Lozza();
+    const vm = this;
+    this.engine.onmessage = e => vm.output.push(e.data);
+
+    this.engine.postMessage('uci');
+    this.engine.postMessage('ucinewgame');
+    this.search(9);
+    this.search(this.depth);
   },
 
   mounted() {
@@ -136,7 +215,10 @@ export default {
     window.addEventListener('resize', () => {
       document.body.dispatchEvent(new Event('chessground.resize'));
     });
-    this.mountEngineBoard();
+    this.engineBoard = Chessground(this.$refs.engineBoard, {
+      viewOnly: true,
+    });
+    this.drawEngineBoard();
   },
 
   updated() {
@@ -149,9 +231,8 @@ export default {
     ...mapActions('analysis', ['makeMove']),
     ...mapMutations('analysis', ['gotoStart', 'gotoCurrent', 'gotoPrevious', 'gotoNext']),
 
-    mountEngineBoard() {
-      this.engineBoard = Chessground(this.$refs.engineBoard, {
-        viewOnly: true,
+    drawEngineBoard() {
+      this.engineBoard.set({
         fen: this.currentFEN,
       });
     },
@@ -232,8 +313,20 @@ export default {
 #engineBoard {
   height: 202px;
   width: 202px;
-  margin: 10px auto;
+  margin: 30px auto;
   border: 1px solid #b1b4b6;
+}
+
+#engineOutput {
+  padding: 20px 50px;
+}
+
+#engineOutput p {
+  margin: 0;
+  font-family: sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 2em;
 }
 
 #buttons {
@@ -247,12 +340,14 @@ export default {
 }
 
 #movehistory {
+  width: 400px;
   padding: 5px;
   border: 1px solid #dee2e6;
   border-radius: 2px;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
   font-size: 13px;
-  margin: 40px;
+  font-family: sans-serif;
+  margin: 20px auto;
 }
 
 .engineTab {
