@@ -1,11 +1,13 @@
 <template>
   <div class="row">
-
+    <!-- Left column -->
     <div class="col-md-6">
+      <!-- Main board -->
       <div class="blue merida">
         <div id="board" class="cg-wrap" ref="board"></div>
       </div>
 
+      <!-- Board navigation buttons -->
       <div id="buttons">
         <button @click="toStart">&lt;&lt;</button>
         <button @click="toPrevious">&lt;</button>
@@ -13,8 +15,8 @@
         <button @click="toCurrent">&gt;&gt;</button>
       </div>
 
+      <!-- History -->
       <div id="movehistory">
-        <h6>Move history</h6>
         <p>
           <span
             v-for="(mv, ix) in history"
@@ -25,55 +27,53 @@
       </div>
     </div>
 
+    <!-- Right column -->
     <div class="col-md-6">
       <b-tabs>
+
+        <!-- Analysis tab -->
         <b-tab title="Analysis" active>
-          <div id="engineOutput" class="engineTab">
+          <div id="engineView" class="engineTab">
 
-            <dl
-              v-if="engineName"
-              class="row">
-              <dt class="col-4">Engine: </dt>
-              <dd class="col-8">
-                {{ engineName }}
-              </dd>
-            </dl>
-            <p>
-              <span
-                v-if="engineName"
-                class="badge badge-pill badge-primary">
-              </span>
-            </p>
+            <!-- Search details -->
+            <div id="searchDetails" class="col-10">
+              <h6>Search</h6>
+              <dl class="row">
+                <dt class="col-4">Best move: </dt>
+                <dd class="col-8">{{ engineBestMove }}</dd>
+              </dl>
 
+              <dl class="row">
+                <dt class="col-4">Time: </dt>
+                <dd class="col-8">{{ engineTime }}ms</dd>
+              </dl>
+
+              <dl class="row">
+                <dt class="col-4">Depth:</dt>
+                <dd class="col-8">{{ engineDepth }}</dd>
+              </dl>
+
+              <dl class="row">
+                <dt class="col-4">PV</dt>
+                <dd class="col-8">
+                  <span
+                    v-for="(mv, ix) in enginePV"
+                    :key="`${mv}${ix}`">
+                    {{ mv }}
+                  </span>
+                </dd>
+              </dl>
+            </div>
+
+            <!-- Engine board -->
             <div class="blue merida">
               <div id="engineBoard" class="cg-wrap" ref="engineBoard"></div>
             </div>
 
-            <dl class="row">
-              <dt class="col-4">Best move: </dt>
-              <dd class="col-8">{{ engineBestMove }}</dd>
-            </dl>
+            <!-- Engine details/options -->
+            <EngineDetails
+              :name="engineName" />
 
-            <dl class="row">
-              <dt class="col-4">Search time: </dt>
-              <dd class="col-8">{{ engineTime }}ms</dd>
-            </dl>
-
-            <dl class="row">
-              <dt class="col-4">Search depth:</dt>
-              <dd class="col-8">{{ engineDepth }}</dd>
-            </dl>
-
-            <dl class="row">
-              <dt class="col-4">PV</dt>
-              <dd class="col-8">
-                <span
-                  v-for="(mv, ix) in enginePV"
-                  :key="`${mv}${ix}`">
-                  {{ mv }}
-                </span>
-              </dd>
-            </dl>
           </div>
         </b-tab>
 
@@ -94,16 +94,20 @@
 </template>
 
 <script>
+// eslint-disable-next-line
+import Lozza from 'worker-loader!../assets/js/lozza';
 import {
   mapActions, mapGetters, mapState, mapMutations,
 } from 'vuex';
-
 import { Chessground } from 'chessground';
-// eslint-disable-next-line
-import Lozza from 'worker-loader!../assets/js/lozza';
+import EngineDetails from '@/components/EngineDetails.vue';
+
 
 export default {
   name: 'Analysis',
+  components: {
+    EngineDetails,
+  },
 
   data() {
     return {
@@ -148,7 +152,7 @@ export default {
           break;
 
         case 'id':
-          if (words.shift() === 'name') this.engineName = words.shift();
+          if (words.shift() === 'name') this.engineName = words.join(' ');
           break;
 
         case 'info':
@@ -297,36 +301,15 @@ export default {
 <style lang="scss">
 @import '../assets/css/chessground.css';
 @import '../assets/css/theme.css';
-
+// Left column
 #board {
   background-size: cover;
   margin: 20px auto;
-
   height: 362px;
   width: 362px;
-
   border: 1px solid black;
   border-radius: 3px;
   box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.5);
-}
-
-#engineBoard {
-  height: 202px;
-  width: 202px;
-  margin: 30px auto;
-  border: 1px solid #b1b4b6;
-}
-
-#engineOutput {
-  padding: 20px 50px;
-}
-
-#engineOutput p {
-  margin: 0;
-  font-family: sans-serif;
-  font-size: 14px;
-  font-weight: bold;
-  line-height: 2em;
 }
 
 #buttons {
@@ -340,20 +323,53 @@ export default {
 }
 
 #movehistory {
-  width: 400px;
-  padding: 5px;
+  width: 320px;
+  height: 80px;
+  overflow: auto;
+  padding: 3px;
   border: 1px solid #dee2e6;
   border-radius: 2px;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
-  font-size: 13px;
+  font-size: 12px;
   font-family: sans-serif;
   margin: 20px auto;
 }
+
+// Right column
 
 .engineTab {
   padding: 5px;
   border: 1px solid #dee2e6;
   border-top: none;
+}
+
+.engineTab h6 {
+  font-family: sans-serif;
+  font-weight: 600;
+}
+
+.engineTab dl {
+  margin: 0;
+  font-family: sans-serif;
+  font-size: 14px;
+  line-height: 1em;
+}
+
+.engineTab dt {
+  margin-bottom: 5px;
+}
+
+#engineBoard {
+  height: 202px;
+  width: 202px;
+  margin: 10px auto;
+  border: 1px solid #b1b4b6;
+}
+
+#searchDetails {
+  margin: 10px auto;
+  padding: 5px;
+  border: 1px solid #dee2e6;
 }
 
 #uciOutput {
@@ -363,7 +379,9 @@ export default {
 
 #uciOutput p {
   white-space: nowrap;
-  font-size: 8px;
+  font-size: 12px !important;
+  font-family: monospace;
+  line-height: 1em;
   margin: 0;
 }
 </style>
