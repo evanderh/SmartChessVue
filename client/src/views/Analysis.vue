@@ -21,56 +21,29 @@
           <span
             v-for="(mv, ix) in history"
             :key="`${ix}${mv.color}`">
+            {{ (ix % 2) === 0 ? ((ix/2)+1 + '.') : ''}}
             {{ mv.san }}
           </span>
         </p>
       </div>
     </div>
 
-    <!-- Right column -->
     <div class="col-md-6">
       <b-tabs>
 
-        <!-- Analysis tab -->
         <b-tab title="Analysis" active>
           <div id="engineView" class="engineTab">
 
-            <!-- Search details -->
-            <div id="searchDetails" class="col-10">
-              <h6>Search</h6>
-              <dl class="row">
-                <dt class="col-4">Best move: </dt>
-                <dd class="col-8">{{ engineBestMove }}</dd>
-              </dl>
+            <SearchDetails
+              :move="engineBestMove" :eval="engineScore"
+              :nps="engineNPS" :time="engineTime"
+              :depth="engineDepth" :seldepth="engineSelDepth"
+              :nodes="engineNodes" :tbhits="engineTBhits" :pv="enginePV" />
 
-              <dl class="row">
-                <dt class="col-4">Time: </dt>
-                <dd class="col-8">{{ engineTime }}ms</dd>
-              </dl>
-
-              <dl class="row">
-                <dt class="col-4">Depth:</dt>
-                <dd class="col-8">{{ engineDepth }}</dd>
-              </dl>
-
-              <dl class="row">
-                <dt class="col-4">PV</dt>
-                <dd class="col-8">
-                  <span
-                    v-for="(mv, ix) in enginePV"
-                    :key="`${mv}${ix}`">
-                    {{ mv }}
-                  </span>
-                </dd>
-              </dl>
-            </div>
-
-            <!-- Engine board -->
+            <!-- Engine -->
             <div class="blue merida">
               <div id="engineBoard" class="cg-wrap" ref="engineBoard"></div>
             </div>
-
-            <!-- Engine details/options -->
             <EngineDetails
               :name="engineName" />
 
@@ -96,33 +69,38 @@
 <script>
 // eslint-disable-next-line
 import Lozza from 'worker-loader!../assets/js/lozza';
+import { Chessground } from 'chessground';
 import {
   mapActions, mapGetters, mapState, mapMutations,
 } from 'vuex';
-import { Chessground } from 'chessground';
+import SearchDetails from '@/components/SearchDetails.vue';
 import EngineDetails from '@/components/EngineDetails.vue';
 
 
 export default {
   name: 'Analysis',
   components: {
+    SearchDetails,
     EngineDetails,
   },
 
   data() {
     return {
+      depth: 13,
       board: null,
       engine: null,
       engineName: '',
       engineBoard: null,
       engineDepth: 0,
+      engineSelDepth: 0,
       engineTime: 0,
       engineNodes: 0,
       enginePV: [],
-      engineScore: '',
+      engineScore: '0.00',
+      engineNPS: 0,
+      engineTBhits: 0,
       engineBestMove: null,
       output: [],
-      depth: 13,
     };
   },
 
@@ -139,10 +117,10 @@ export default {
     output(output) {
       // Watch the engine output, UCI protocol
       // http://wbec-ridderkerk.nl/html/UCIProtocol.html
-      if (output.length > 200) output.shift();
+      while (output.length > 200) output.shift();
 
       const newline = output[output.length - 1];
-      let words = newline.split(' ');
+      const words = newline.split(' ');
 
       const UCIword = words.shift();
       let word = null;
@@ -163,6 +141,9 @@ export default {
               case 'depth':
                 this.engineDepth = parseInt(words.shift(), 10);
                 break;
+              case 'seldepth':
+                this.engineSelDepth = parseInt(words.shift(), 10);
+                break;
 
               case 'time':
                 this.engineTime = parseInt(words.shift(), 10);
@@ -172,9 +153,17 @@ export default {
                 this.engineNodes = parseInt(words.shift(), 10);
                 break;
 
+              case 'nps':
+                this.engineNPS = parseInt(words.shift(), 10);
+                break;
+
+              case 'score':
+                if (words.shift() === 'cp') this.engineScore = (parseInt(words.shift(), 10) / 100).toFixed(2);
+                else this.engineScore = `Mate in ${parseInt(words.shift(), 10) + 1}`;
+                break;
+
               case 'pv':
-                this.enginePV = words;
-                words = []; // empty words to exit outer loop
+                this.enginePV = words.slice();
                 break;
 
               default:
@@ -197,9 +186,6 @@ export default {
       this.engineBoard.move(orig, dest);
     },
 
-    enginePV(newPV) {
-      console.log('pv', newPV[0]);
-    },
   },
 
   created() {
@@ -341,6 +327,9 @@ export default {
   padding: 5px;
   border: 1px solid #dee2e6;
   border-top: none;
+  font-family: sans-serif;
+  font-size: 14px;
+  line-height: 1em;
 }
 
 .engineTab h6 {
@@ -348,15 +337,8 @@ export default {
   font-weight: 600;
 }
 
-.engineTab dl {
+.engineTab dl, .engineTab dd {
   margin: 0;
-  font-family: sans-serif;
-  font-size: 14px;
-  line-height: 1em;
-}
-
-.engineTab dt {
-  margin-bottom: 5px;
 }
 
 #engineBoard {
@@ -366,11 +348,6 @@ export default {
   border: 1px solid #b1b4b6;
 }
 
-#searchDetails {
-  margin: 10px auto;
-  padding: 5px;
-  border: 1px solid #dee2e6;
-}
 
 #uciOutput {
   height: 500px;

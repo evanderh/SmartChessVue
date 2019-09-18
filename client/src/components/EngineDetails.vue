@@ -24,18 +24,7 @@
           <small>Loading...</small>
         </dd>
       </dl>
-      <!-- Engine description -->
-      <dl class="row">
-        <dt class="col-3">Description: </dt>
-        <dd v-if="key" class="col-9">
-          <small>{{ details[key].description }}</small>
-        </dd>
-        <dd v-else class="col-9">
-          <small>Loading...</small>
-        </dd>
-      </dl>
     </div>
-    <!-- Loading -->
   </div>
 </template>
 
@@ -52,9 +41,6 @@ export default {
     return {
       details: {
         Lozza: {
-          description: `A simple Javascript UCI chess engine rated about 2400 on
-            CCRL. Lozza is a traditional engine with an evaluation function based
-            on Fabien Letouzey's Fruit.`,
           link: 'https://github.com/op12no2/lozza',
         },
       },
