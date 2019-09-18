@@ -1,7 +1,8 @@
 <template>
   <div id="app">
+    <hr />
 
-    <div id="nav">
+    <!-- <div id="nav">
 
       <router-link to="/">Smart Chess</router-link> |
 
@@ -18,7 +19,7 @@
 
       <button @click="playGame">Play</button>
 
-    </div>
+    </div> -->
 
     <div class="container-fluid">
       <div class="row">
