@@ -18,7 +18,7 @@ def create_app(config_obj=config.Config):
     """App factory for Bender Chess"""
 
     # Create + configure app
-    app = Flask(__name__, static_folder='../dist/static')
+    app = Flask(__name__, static_folder='../static')
     app.config.from_object(config_obj)
 
     # Init plugins

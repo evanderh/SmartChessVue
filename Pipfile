@@ -19,6 +19,7 @@ requests = "*"
 pytest-dotenv = "*"
 flask-cors = "*"
 pyjwt = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.7"

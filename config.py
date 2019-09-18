@@ -14,7 +14,7 @@ class Config():
 
     # Directories
     APP_DIR = os.path.dirname(__file__)
-    DIST_DIR = os.path.join(APP_DIR, 'dist')
+    STATIC_DIR = os.path.join(APP_DIR, 'static')
 
     # Logging
     LOGCONFIG = {

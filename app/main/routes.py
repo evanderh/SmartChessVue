@@ -27,8 +27,8 @@ def after_request(response):
 
 @bp.route('/')
 def home():
-    dist_dir = current_app.config['DIST_DIR']
-    entry = os.path.join(dist_dir, 'index.html')
+    static_dir = current_app.config['STATIC_DIR']
+    entry = os.path.join(static_dir, 'index.html')
     return send_file(entry)
 
 

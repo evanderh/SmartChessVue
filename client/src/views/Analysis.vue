@@ -53,7 +53,7 @@
                 <b-form-input
                   id="searchDepthInput" class="align-middle"
                   v-model="depth"
-                  type="range" min="1" max="20"
+                  type="range" min="1" max="16"
                 ></b-form-input>
               </span>
             </div>
