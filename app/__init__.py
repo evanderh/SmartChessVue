@@ -31,11 +31,11 @@ def create_app(config_obj=config.Config):
     CORS(app)
 
     # Add blueprints
-    from BenderChess.errors import bp as errorsbp
+    from app.errors import bp as errorsbp
     app.register_blueprint(errorsbp)
-    from BenderChess.main import bp as mainbp
+    from app.main import bp as mainbp
     app.register_blueprint(mainbp)
-    from BenderChess.api import bp as apibp
+    from app.api import bp as apibp
     app.register_blueprint(apibp, url_prefix='/api')
 
     if not os.path.exists('logs'):
@@ -45,4 +45,4 @@ def create_app(config_obj=config.Config):
     return app
 
 
-from BenderChess import models  # noqa: E403, F401
+from app import models  # noqa: E403, F401

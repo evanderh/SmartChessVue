@@ -1,6 +1,6 @@
 from flask import render_template
-from BenderChess import db
-from BenderChess.errors import bp
+from app import db
+from app.errors import bp
 
 
 @bp.app_errorhandler(404)

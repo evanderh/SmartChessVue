@@ -1,7 +1,7 @@
 import pytest
 
-from BenderChess import create_app
-from BenderChess import db as _db
+from app import create_app
+from app import db as _db
 from test.helpers import create_user
 import config
 

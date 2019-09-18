@@ -1,3 +1,4 @@
-# BenderChess
+# Smart Chess
 
-A chess server
+A chess game analysis tool written in Python and JavaScript
+

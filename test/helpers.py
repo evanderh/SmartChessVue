@@ -2,7 +2,7 @@
 """Helper functions for test modules"""
 from flask import current_app
 
-from BenderChess.models import User
+from app.models import User
 
 
 def login_user(client, username=None, password=None):

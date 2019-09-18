@@ -1,5 +1,5 @@
 import os
-from BenderChess.logs import RequestFilter
+from app.logs import RequestFilter
 
 
 class Config():

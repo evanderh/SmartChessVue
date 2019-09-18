@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test module for user registration and login"""
 from flask import current_app
-from BenderChess.models import User
+from app.models import User
 from test import app, db, client, session  # noqa: F401
 from test.helpers import register_user, create_user, login_user, logout_user
 

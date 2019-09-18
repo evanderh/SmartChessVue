@@ -4,9 +4,9 @@ import uuid
 import time
 from datetime import datetime, timedelta
 from flask import send_file, request, current_app, jsonify, g
-from BenderChess import db
-from BenderChess.main import bp
-from BenderChess.models import User
+from app import db
+from app.main import bp
+from app.models import User
 
 
 @bp.before_app_request

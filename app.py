@@ -1,5 +1,5 @@
-from BenderChess import create_app, db
-from BenderChess.models import User, Game
+from app import create_app, db
+from app.models import User, Game
 
 
 app = create_app()

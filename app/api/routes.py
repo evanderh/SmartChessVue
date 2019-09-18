@@ -1,6 +1,6 @@
 from flask import jsonify
-# from BenderChess import db
-from BenderChess.api import bp
+# from app import db
+from app.api import bp
 
 games = {
     '1': {

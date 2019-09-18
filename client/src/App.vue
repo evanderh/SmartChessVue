@@ -3,7 +3,7 @@
 
     <div id="nav">
 
-      <router-link to="/">BenderChess</router-link> |
+      <router-link to="/">Smart Chess</router-link> |
 
       <router-link
         v-if="!account.status.loggedIn"

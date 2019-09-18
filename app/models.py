@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy.dialects.postgresql import UUID
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from BenderChess import db, login
+from app import db, login
 
 
 class User(UserMixin, db.Model):
