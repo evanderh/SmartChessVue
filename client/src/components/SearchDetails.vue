@@ -1,7 +1,7 @@
 <template>
   <div id="SearchDetails" class="col-10">
     <div>
-      <h6>Search</h6>
+      <h6>Search Results</h6>
 
       <dl class="row">
         <dt class="col-6 text-right">Best move: </dt>
@@ -27,25 +27,23 @@
 
       <dl class="row" align-v="center">
         <dt class="col-3 text-right">Nodes: </dt>
-        <dd class="col-3">{{ (nodes/1e6).toFixed(2) }} M</dd>
+        <dd class="col-3">{{ (nodes/1e3).toFixed(0) }} K</dd>
         <dt class="col-3 text-right">TB hits:</dt>
         <dd class="col-3">{{ tbhits }}</dd>
       </dl>
       <hr />
 
-
       <dl class="row">
         <dt class="col-3 text-right">Principal Variation: </dt>
         <dd class="col-9">
           <span
-            v-for="(mv, ix) in pv"
+            v-for="(mv, ix) in pvmoves"
             :key="`${mv}${ix}`">
-            {{ (ix % 2) === 0 ? ((ix/2)+1 + '.') : ''}}
+            <!-- {{ (ix % 2) === 0 ? ((ix/2)+1 + '.') : ''}} -->
             {{ mv }}
           </span>
         </dd>
       </dl>
-
     </div>
   </div>
 </template>
@@ -54,6 +52,11 @@
 export default {
   name: 'EngineDetails',
   props: ['move', 'eval', 'nps', 'time', 'depth', 'seldepth', 'nodes', 'tbhits', 'pv'],
+  computed: {
+    pvmoves() {
+      return this.pv.filter(mv => mv);
+    },
+  },
 };
 </script>
 
@@ -63,6 +66,7 @@ export default {
   margin: 0 auto;
   padding: 5px;
   border: 1px solid #dee2e6;
+  height: 210px;
 }
 
 #SearchDetails hr {

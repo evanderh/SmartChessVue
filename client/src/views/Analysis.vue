@@ -39,6 +39,24 @@
               :nps="engineNPS" :time="engineTime"
               :depth="engineDepth" :seldepth="engineSelDepth"
               :nodes="engineNodes" :tbhits="engineTBhits" :pv="enginePV" />
+            <hr style="margin-bottom:0"/>
+
+            <!-- Search Options -->
+            <div class="m-2">
+              <b-button squared variant="primary" @click="onSearch" size="sm" >Search</b-button>
+              <!-- <b-dropdown text="Mode" variant="outline-secondary" size="sm" class="m-2">
+                <b-dropdown-item href="#">Search depth: 8</b-dropdown-item>
+              </b-dropdown> -->
+
+              <span>
+                <label for="searchDepth" class="m-2">Depth: {{ depth }}</label>
+                <b-form-input
+                  id="searchDepthInput" class="align-middle"
+                  v-model="depth"
+                  type="range" min="1" max="20"
+                ></b-form-input>
+              </span>
+            </div>
 
             <!-- Engine -->
             <div class="blue merida">
@@ -86,7 +104,7 @@ export default {
 
   data() {
     return {
-      depth: 13,
+      depth: 10,
       board: null,
       engine: null,
       engineName: '',
@@ -107,6 +125,33 @@ export default {
   computed: {
     ...mapState('analysis', ['currentGame']),
     ...mapGetters('analysis', ['boardOptions', 'history', 'currentFEN']),
+  },
+
+  created() {
+    this.engine = new Lozza();
+    const vm = this;
+    this.engine.onmessage = e => vm.output.push(e.data);
+
+    this.engine.postMessage('uci');
+    this.engine.postMessage('ucinewgame');
+  },
+
+  mounted() {
+    const options = this.addAfterMove(this.boardOptions);
+    this.board = Chessground(this.$refs.board, options);
+    window.addEventListener('resize', () => {
+      document.body.dispatchEvent(new Event('chessground.resize'));
+    });
+    this.engineBoard = Chessground(this.$refs.engineBoard, {
+      viewOnly: true,
+    });
+    this.drawEngineBoard();
+  },
+
+  updated() {
+    // Scroll to bottom of uci output
+    const output = this.$refs.uciOutputDiv;
+    output.scrollTop = output.scrollHeight;
   },
 
   watch: {
@@ -188,35 +233,6 @@ export default {
 
   },
 
-  created() {
-    this.engine = new Lozza();
-    const vm = this;
-    this.engine.onmessage = e => vm.output.push(e.data);
-
-    this.engine.postMessage('uci');
-    this.engine.postMessage('ucinewgame');
-    this.search(9);
-    this.search(this.depth);
-  },
-
-  mounted() {
-    const options = this.addAfterMove(this.boardOptions);
-    this.board = Chessground(this.$refs.board, options);
-    window.addEventListener('resize', () => {
-      document.body.dispatchEvent(new Event('chessground.resize'));
-    });
-    this.engineBoard = Chessground(this.$refs.engineBoard, {
-      viewOnly: true,
-    });
-    this.drawEngineBoard();
-  },
-
-  updated() {
-    // Scroll to bottom of uci output
-    const output = this.$refs.uciOutputDiv;
-    output.scrollTop = output.scrollHeight;
-  },
-
   methods: {
     ...mapActions('analysis', ['makeMove']),
     ...mapMutations('analysis', ['gotoStart', 'gotoCurrent', 'gotoPrevious', 'gotoNext']),
@@ -229,7 +245,13 @@ export default {
 
     search(depth) {
       this.engine.postMessage(`position fen ${this.currentFEN}`);
+      if (depth === 'infinite') this.engine.postMessage(`go ${depth}`);
       this.engine.postMessage(`go depth ${depth}`);
+    },
+
+    onSearch() {
+      this.engine.postMessage(`position ${this.currentFEN}`);
+      this.search(this.depth);
     },
 
     toStart() {
@@ -339,6 +361,10 @@ export default {
 
 .engineTab dl, .engineTab dd {
   margin: 0;
+}
+
+#searchDepthInput {
+  width: 100px;
 }
 
 #engineBoard {
