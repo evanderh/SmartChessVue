@@ -1,18 +1,22 @@
 server {
     # listen on port 80 (http)
     listen 80;
-    server_name _;
+    server_name smartchess.xyz;
+    location ~ /.well-known {
+        root /home/ubuntu/LetsEncrypt;
+    }
     location / {
-        # redirect any requests to the same URL but on https
+        # redirect requests to https
         return 301 https://$host$request_uri;
     }
 }
 server {
     # listen on port 443 (https)
     listen 443 ssl;
-    server_name _;
+    server_name smartchess:.xyz;
 
-    # location of the self-signed SSL certificate
+    # LetsEncrypt SSL Certs
+    # https://blog.miguelgrinberg.com/post/running-your-flask-application-over-https
     ssl_certificate /home/ubuntu/SmartChess/instance/cert.pem;
     ssl_certificate_key /home/ubuntu/SmartChess/instance/key.pem;
 
@@ -31,7 +35,7 @@ server {
 
     location /static {
         # handle static files directly, without forwarding to the application
-        alias /home/ubuntu/microblog/app/static;
+        alias /home/ubuntu/SmartChess/static;
         expires 30d;
     }
 }
