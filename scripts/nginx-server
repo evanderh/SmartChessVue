@@ -16,6 +16,9 @@ server {
     server_name smartchess:.xyz;
 
     # LetsEncrypt SSL Certs
+    # Renew once every 90 days with : LAST - Sept 20, 2019
+    # $ sudo certbot renew
+    # TODO: Add Diffie-Hellman coefficients
     # https://blog.miguelgrinberg.com/post/running-your-flask-application-over-https
     ssl_certificate /home/ubuntu/SmartChess/instance/cert.pem;
     ssl_certificate_key /home/ubuntu/SmartChess/instance/key.pem;
