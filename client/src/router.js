@@ -29,5 +29,10 @@ export default new Router({
       name: 'Game',
       component: () => import(/* webpackChunkName: "about" */ './views/Game.vue'),
     },
+    {
+      path: '/account',
+      name: 'Account',
+      component: () => import(/* webpackChunkName: "about" */ './views/Account.vue'),
+    },
   ],
 });

@@ -1,8 +1,7 @@
 <template>
   <div id="app">
-    <hr />
 
-    <!-- <div id="nav">
+    <div id="nav">
 
       <router-link to="/">Smart Chess</router-link> |
 
@@ -17,9 +16,15 @@
         Logout
       </router-link> |
 
-      <button @click="playGame">Play</button>
+      <button @click="newGame">New game</button> |
+      <router-link
+        v-if="account.status.loggedIn"
+        to="/account">
+        Account
+      </router-link>
 
-    </div> -->
+    </div>
+    <hr />
 
     <div class="container-fluid">
       <div class="row">
@@ -50,7 +55,7 @@ export default {
       clearAlert: 'alert/clear',
       logout: 'account/logout',
     }),
-    playGame() {
+    newGame() {
       api.game.createGame()
         .then((gameID) => {
           this.$router.push({ name: 'Game', params: { id: gameID } });

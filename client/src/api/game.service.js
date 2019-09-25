@@ -40,7 +40,17 @@ function getGame(id) {
   return fetch(`${GAME_API}/game/${id}`, requestOptions).then(handleResponse);
 }
 
+function getGames() {
+  const requestOptions = {
+    method: 'GET',
+    headers: authHeader(),
+  };
+
+  return fetch(`${GAME_API}/game`, requestOptions).then(handleResponse);
+}
+
 export default {
   createGame,
   getGame,
+  getGames,
 };

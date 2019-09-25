@@ -1,9 +1,8 @@
-import os
 import jwt
 import uuid
 import time
 from datetime import datetime, timedelta
-from flask import send_file, request, current_app, jsonify, g
+from flask import request, current_app, jsonify, g
 from app import db
 from app.main import bp
 from app.models import User
@@ -23,13 +22,6 @@ def after_request(response):
     elapsed = round(time.time() - g.get('start', time.time()), 4)
     current_app.logger.debug(f'Response took {elapsed}s')
     return response
-
-
-@bp.route('/')
-def home():
-    static_dir = current_app.config['STATIC_DIR']
-    entry = os.path.join(static_dir, 'index.html')
-    return send_file(entry)
 
 
 @bp.route('/login', methods=['POST'])
