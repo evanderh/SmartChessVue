@@ -3,7 +3,13 @@
     <p>Your account</p>
     <div>
       <p>Your games</p>
-      <p>{{ games }}</p>
+      <ul>
+        <li
+          v-for="game in games"
+          :key="game.id">
+          {{ game.fen }}
+        </li>
+      </ul>
     </div>
   </div>
 </template>
