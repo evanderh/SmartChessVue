@@ -20,8 +20,8 @@ server {
     # $ sudo certbot renew
     # TODO: Add Diffie-Hellman coefficients
     # https://blog.miguelgrinberg.com/post/running-your-flask-application-over-https
-    ssl_certificate /home/ubuntu/SmartChess/instance/cert.pem;
-    ssl_certificate_key /home/ubuntu/SmartChess/instance/key.pem;
+    ssl_certificate /home/ubuntu/LetsEncrypt/fullchain.pem;
+    ssl_certificate_key /home/ubuntu/LetsEncrypt/privkey.pem;
 
     # write access and error logs to /var/log
     access_log /var/log/server-access.log;
