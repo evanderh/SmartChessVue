@@ -1,40 +1,37 @@
-from flask import jsonify
-# from app import db
+from flask import jsonify, current_app
+from flask_login import current_user
+from app import db
 from app.api import bp
-
-games = {
-    '1': {
-        'id': '1',
-        'fen': 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR  w KQkq - 0 1',
-    },
-    '2': {
-        'id': '2',
-        'fen': 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1',
-    },
-}
+from app.models import Game
 
 
-@bp.route('/user/<string:username>')
-def getUser(username):
-    return jsonify({
-        'username': username
-    })
-
-
-@bp.route('/game', methods=['GET'])
+@bp.route('/games', methods=['GET'])
 def game_api_get():
-    # Get all games
-    return jsonify(games)
+    current_app.logger.debug('getting all games')
+
+    games = Game.query.all()
+    return jsonify([game.to_dict() for game in games])
 
 
-@bp.route('/game', methods=['POST'])
+@bp.route('/games', methods=['POST'])
 def game_api_post():
-    # Create a new game and return its' id
-    # For now always return an id of 2
-    # TODO: Create a new game
-    return jsonify(2)
+    current_app.logger.debug(f'creating game')
+
+    if current_user.is_anonymous:
+        game = Game()
+    else:
+        game = Game(player=current_user)
+
+    db.session.add(game)
+    db.session.commit()
+
+    return jsonify(game.to_dict())
 
 
-@bp.route('/game/<string:id>')
-def getGameID(id):
-    return jsonify(games[id])
+@bp.route('/games/<int:id>')
+def game_api_get_game(id):
+    user = current_user
+    current_app.logger.debug(f'getting game {id} for {user}')
+
+    game = Game.query.get(id)
+    return jsonify(game.to_dict())

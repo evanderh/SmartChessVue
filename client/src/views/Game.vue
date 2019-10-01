@@ -1,16 +1,16 @@
 <template>
-  <div v-if="startFEN">
+  <div v-if="startfen">
     <Board
       :startfen="startFEN"
     />
   </div>
+
   <div v-else>
     <p>Loading...</p>
   </div>
 </template>
 
 <script>
-import Board from '@/components/Board.vue';
 import api from '@/api';
 
 export default {
@@ -20,17 +20,30 @@ export default {
   },
   data() {
     return {
-      gameID: null,
-      startFEN: null,
+      id: null,
     };
   },
   created() {
-    const gameID = this.$route.params.id;
-    api.game.getGame(gameID)
-      .then((response) => {
-        this.gameID = response.id;
-        this.startFEN = response.fen;
-      });
+    this.loadGame();
+  },
+  methods: {
+    loadGame() {
+      const gameID = this.$route.params.id;
+      api.game.getGame(gameID)
+        .then((response) => {
+          console.log(response);
+        });
+    },
+  },
+  watch: {
+    $route() {
+      this.loadGame();
+    },
   },
 };
 </script>
+
+<style lang="scss">
+@import '../assets/css/chessground.css';
+@import '../assets/css/theme.css';
+</style>

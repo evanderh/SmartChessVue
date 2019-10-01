@@ -139,12 +139,13 @@ export default {
   mounted() {
     const options = this.addAfterMove(this.boardOptions);
     this.board = Chessground(this.$refs.board, options);
-    window.addEventListener('resize', () => {
-      document.body.dispatchEvent(new Event('chessground.resize'));
-    });
     this.engineBoard = Chessground(this.$refs.engineBoard, {
       viewOnly: true,
     });
+
+    // window.addEventListener('resize', () => {
+    //   document.body.dispatchEvent(new Event('chessground.resize'));
+    // });
     this.drawEngineBoard();
   },
 

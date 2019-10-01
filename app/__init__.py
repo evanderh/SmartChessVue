@@ -18,8 +18,10 @@ def create_app(config_obj=config.Config):
     """App factory for Bender Chess"""
 
     # Create + configure app
-    app = Flask(__name__, static_folder='../static')
+    app = Flask(__name__, static_folder='../static',
+                instance_relative_config=True)
     app.config.from_object(config_obj)
+    app.config.from_pyfile('config.py')
 
     # Init plugins
     db.init_app(app)
@@ -31,8 +33,6 @@ def create_app(config_obj=config.Config):
     CORS(app)
 
     # Add blueprints
-    from app.errors import bp as errorsbp
-    app.register_blueprint(errorsbp)
     from app.main import bp as mainbp
     app.register_blueprint(mainbp)
     from app.api import bp as apibp

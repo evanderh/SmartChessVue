@@ -1,4 +1,6 @@
+import jwt
 import uuid
+from flask import current_app, g, jsonify
 from flask_login import UserMixin
 from datetime import datetime
 from sqlalchemy.dialects.postgresql import UUID
@@ -14,21 +16,19 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(UUID(as_uuid=True), unique=True, nullable=False,
                      default=uuid.uuid4)
-    admin = db.Column(db.Boolean, default=False, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
-
-    # Basic user info
-    email = db.Column(db.String(128), index=True, unique=True, nullable=False)
+    email = db.Column(db.String(128), index=True, unique=True,
+                      nullable=False)
     username = db.Column(db.String(128), index=True, unique=True,
                          nullable=False)
 
     # Metadata
+    admin = db.Column(db.Boolean, default=False, nullable=False)
+    bot = db.Column(db.Boolean, default=False, nullable=False)
     created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     last_seen = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
-    games = db.relationship("Game",
-                            primaryjoin="or_(User.id==Game.white_id, "
-                                        "User.id==Game.black_id)")
+    games = db.relationship("Game", back_populates="player", lazy='dynamic')
 
     def __init__(self, password, **kwargs):
         super().__init__(**kwargs)
@@ -65,30 +65,88 @@ class User(UserMixin, db.Model):
         return f"<User username={self.username}>"
 
 
+DEFAULT_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR  w KQkq - 0 1'
+DEFAULT_HISTORY = {
+    'moves': [],
+}
+
+
 class Game(db.Model):
     __tablename__ = "games"
 
     # Identification
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(UUID(as_uuid=True), unique=True, nullable=False,
-                     default=uuid.uuid4().hex)
+                     default=uuid.uuid4)
 
-    # Game data
-    fen = db.Column(db.String(128), nullable=False)
-    white_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    black_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    white_player = db.relationship("User", foreign_keys=[white_id])
-    black_player = db.relationship("User", foreign_keys=[black_id])
+    # Essential game data
+    result = db.Column(db.String(8), nullable=False, default='*')
+    ply_count = db.Column(db.Integer, default=0)
+    time_control_field = db.Column(db.String(128), default='-')
+    termination = db.Column(db.String(128), default='unterminated')
+    startfen = db.Column(db.String(128), nullable=False, default=DEFAULT_FEN)
+    history = db.Column(db.JSON, nullable=False, default=DEFAULT_HISTORY)
+    mode = db.Column(db.String(128), nullable=False, default='analysis')
+
+    # Relationship with user
+    player_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    player = db.relationship("User", back_populates="games")
 
     def to_dict(self):
-        return dict(uuid=self.uuid,
-                    fen=self.fen)
+        return dict(id=self.id,
+                    uuid=self.uuid,
+                    result=self.result,
+                    ply_count=self.ply_count,
+                    time_control_field=self.time_control_field,
+                    termination=self.termination,
+                    startfen=self.startfen,
+                    history=self.history,
+                    mode=self.mode)
 
     def __repr__(self):
         return f"<Game fen={self.fen}>"
 
 
-@login.user_loader
-def load_user(id):
-    """Flask-login user loader"""
-    return User.query.get(int(id))
+unauthorized_header = {
+    'message': 'Invalid token. Authentication required',
+    'authenticated': False
+}
+expired_header = {
+    'message': 'Expired token. Reauthentication required.',
+    'authenticated': False
+}
+
+# Configure flask-login request loader
+@login.request_loader
+def load_user_from_request(request):
+    auth_headers = request.headers.get('Authorization', '').split()
+    if len(auth_headers) != 2:
+        g.unauthorized_header = unauthorized_header
+        return None
+
+    try:
+        token = auth_headers[1]
+        data = jwt.decode(token,
+                          current_app.config['SECRET_KEY'],
+                          algorithms=['HS256'])
+        user = User.query.filter_by(email=data['sub']).first()
+        if user:
+            return user
+    except jwt.ExpiredSignatureError as e:
+        current_app.logger.debug(e)
+        g.unauthorized_response = unauthorized_header
+        return None
+    except jwt.InvalidTokenError as e:
+        current_app.logger.debug(e)
+        g.unauthorized_response = expired_header
+        return None
+
+    return None
+
+
+@login.unauthorized_handler
+def unauthorized():
+    if 'unauthorized_response' in g:
+        return jsonify(g.unauthorized_response), 401
+    else:
+        return jsonify(unauthorized_header), 401

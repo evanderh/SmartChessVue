@@ -3,7 +3,8 @@
 
     <div id="nav">
 
-      <router-link to="/">Smart Chess</router-link> |
+      <router-link to="/">Smart Chess</router-link>
+      <span> | </span>
 
       <router-link
         v-if="!account.status.loggedIn"
@@ -14,14 +15,21 @@
         v-else
         to="/login">
         Logout
-      </router-link> |
+      </router-link>
+      <span> | </span>
 
-      <button @click="newGame">New game</button> |
+      <button
+        @click="newGame">
+        New game
+      </button>
+      <span v-if="account.status.loggedIn"> | </span>
+
       <router-link
         v-if="account.status.loggedIn"
         to="/account">
         Account
       </router-link>
+      <span v-if="account.status.loggedIn"> | </span>
 
     </div>
     <hr />
@@ -57,8 +65,8 @@ export default {
     }),
     newGame() {
       api.game.createGame()
-        .then((gameID) => {
-          this.$router.push({ name: 'Game', params: { id: gameID } });
+        .then((game) => {
+          this.$router.push({ name: 'Game', params: { id: game.id } });
         });
     },
   },
@@ -69,3 +77,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+#nav {
+  padding-top: 5px;
+  padding-left: 5px;
+}
+</style>

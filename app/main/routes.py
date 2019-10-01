@@ -35,9 +35,9 @@ def login():
             'authenticated': False
         }), 401
 
-    payload = {'sub': user.username,
+    payload = {'sub': user.email,
                'iat': datetime.utcnow(),
-               'exp': datetime.utcnow() - timedelta(hours=1)}
+               'exp': datetime.utcnow() + timedelta(hours=1)}
 
     token = jwt.encode(payload,
                        current_app.config['SECRET_KEY'],

@@ -19,6 +19,3 @@ static/
 
 # Dev
 .vscode
-
-# Secrets
-.prod_env

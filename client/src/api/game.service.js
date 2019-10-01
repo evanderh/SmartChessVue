@@ -1,5 +1,5 @@
 import helpers from '../helpers';
-import logout from './user.service';
+import user from './user.service';
 
 const { authHeader } = helpers;
 const GAME_API = 'http://localhost:5000/api';
@@ -11,7 +11,7 @@ function handleResponse(response) {
     if (!response.ok) {
       if (response.status === 401) {
         // auto logout if 401 response returned from api
-        logout();
+        user.logout();
       }
 
       const error = (data && data.message) || response.statusText;
@@ -28,7 +28,7 @@ function createGame() {
     headers: authHeader(),
   };
 
-  return fetch(`${GAME_API}/game`, requestOptions).then(handleResponse);
+  return fetch(`${GAME_API}/games`, requestOptions).then(handleResponse);
 }
 
 function getGame(id) {
@@ -37,7 +37,7 @@ function getGame(id) {
     headers: authHeader(),
   };
 
-  return fetch(`${GAME_API}/game/${id}`, requestOptions).then(handleResponse);
+  return fetch(`${GAME_API}/games/${id}`, requestOptions).then(handleResponse);
 }
 
 function getGames() {
@@ -46,7 +46,7 @@ function getGames() {
     headers: authHeader(),
   };
 
-  return fetch(`${GAME_API}/game`, requestOptions).then(handleResponse);
+  return fetch(`${GAME_API}/games`, requestOptions).then(handleResponse);
 }
 
 export default {
